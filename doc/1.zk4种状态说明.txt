@@ -1,0 +1,22 @@
+zookeeper集群中server的四种状态：
+
+(1) looking：刚启动zookeeper时，正在进行选举leader的过程的server所处状态
+(2) leading：已被选举为leader后的server所处状态
+(3) following: 成为follower后的server所处状态
+(4) observing : 在一个很大的集群中，没有投票权的server所处状态
+
+查看源码： QuorumPeer 1302行
+
+observer相关问题：
+
+(1) 为什么引入observer?
+为了提高客户端从集群读数据的能力，对集群进行扩大。但是随着集群的扩大，由于向集群写数据需要使用过半数同意的投票机制，导致向集群写数据的能力下降。而为了避免为提高读性能扩大集群时候导致写性能降低问题，因此引入了observer。
+(2) 为什么加入observer后可以避免为提高读性能扩大集群时候导致写性能降低问题？
+加入observer后，observer服务器不会参与写投票，只有leader和follower才可以对写操作进行投票，当leader和follower投票后表示同意写操作，leader将同意的信息发送给follower和observer，然后follower和observer进行落实写操作。
+(3) 使用observer的场景？
+(I) 集群非常大的时候；
+(II) 有多个数据中心时，由于不同数据中心距离远，网络传输数据相对慢，可以将一个数据中心中的server设置为leader和follower，其他数据中心的server都为observer。
+一般用不到observer。
+————————————————
+版权声明：本文为CSDN博主「Chasing__Dreams」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/Chasing__Dreams/article/details/113884409

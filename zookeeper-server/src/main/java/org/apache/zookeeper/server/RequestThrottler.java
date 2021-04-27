@@ -154,6 +154,7 @@ public class RequestThrottler extends ZooKeeperCriticalThread {
                             request = null;
                             break;
                         }
+                        //如果队列满了，则等待
                         if (zks.getInProcess() < maxRequests) {
                             break;
                         }
